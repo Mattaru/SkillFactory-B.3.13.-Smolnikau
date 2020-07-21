@@ -1,4 +1,3 @@
-
 class Tag:
     def __init__(self, tag, is_single = False, toplevel = False, klass = None, **kwargs):
         self.tag = tag
@@ -25,17 +24,17 @@ class Tag:
             attrs.append("%s='%s'"%(attr, val))
         attrs = " ".join(attrs)
         if self.childrens:
-            op = "<{tag} {attrs}>".format(tag = self.tag, attrs = attrs)
+            op = "<{tag} {attrs}>\n".format(tag = self.tag, attrs = attrs)
             inter = "%s"%self.text
             for child in self.childrens:
                 inter += str(child)
-            ed = "</%s>"%self.tag
+            ed = "</%s>\n"%self.tag
             return op + inter + ed
         else:
             if self.is_single:
-                return "<{tag} {attrs}>".format(tag = self.tag, attrs = attrs)
+                return "<{tag} {attrs}>\n".format(tag = self.tag, attrs = attrs)
             else:
-                return "<{tag} {attrs}>{text}</{tag}>".format(tag = self.tag, attrs = attrs, text = self.text)
+                return "<{tag} {attrs}>{text}</{tag}>\n".format(tag = self.tag, attrs = attrs, text = self.text)
 
     def __add__(self, other):
         self.childrens.append(other)
@@ -43,7 +42,7 @@ class Tag:
 
 # Делаем класс HTML наследником Tag
 class HTML(Tag):
-    def __init__(self, output=None): # Убираем возможность ввода доп параметров
+    def __init__(self, output = None): # Убираем возможность ввода доп параметров
         self.tag = "html" # Добавляем готовый tag
         # Присваиваем готовые значения для is_single и toplevel
         self.is_single = False
@@ -65,13 +64,8 @@ class HTML(Tag):
                     print(child)
                 print("</%s>" % self.tag)
         else: # Иначе записываем рузультат в нужный нам файл, указанный в значении output
-            file_op = open(self.output, "w")
-            if self.toplevel:
-                file_op.write("<%s>"%self.tag)
-                for child in self.childrens:
-                    file_op.write(str(child))
-                file_op.write("</%s>"%self.tag)
-            file_op.close()
+            with open(self.output, "w") as file_op:
+                file_op.write(str(self))
 
 # Делаем класс TopLevelTag наследником Tag
 class TopLevelTag(Tag):
